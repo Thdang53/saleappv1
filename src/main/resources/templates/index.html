@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bán Hàng Trực Tuyến - Trang Chủ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="container navbar">
+            <a th:href="@{/}" class="navbar-brand">
+                🛒 BÁN HÀNG TRỰC TUYẾN
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a th:href="@{/products}" class="nav-link">Tất cả</a></li>
+                    <li><a th:href="@{/products(categoryId=1)}" class="nav-link">Điện thoại di động</a></li>
+                    <li><a th:href="@{/products(categoryId=2)}" class="nav-link">Máy tính bảng</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>BÁN HÀNG TRỰC TUYẾN</h1>
+                <p>Khám phá các sản phẩm công nghệ cao cấp chính hãng với mức giá ưu đãi nhất.</p>
+                
+                <!-- Các liên kết theo yêu cầu đề bài -->
+                <div class="hero-categories">
+                    <a th:href="@{/products}" class="category-btn">
+                        📦 Tất cả sản phẩm
+                    </a>
+                    <a th:href="@{/products(categoryId=1)}" class="category-btn">
+                        📱 Điện thoại di động
+                    </a>
+                    <a th:href="@{/products(categoryId=2)}" class="category-btn">
+                        💻 Máy tính bảng
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="container" style="margin-bottom: 60px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="font-size: 1.8rem; font-weight: 700; color: #1f2937;">Chào mừng bạn đến với Cửa Hàng</h2>
+                <p style="color: #6b7280; margin-top: 8px;">Chọn danh mục bên dưới hoặc click "Tất cả sản phẩm" để bắt đầu mua sắm</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                <div style="background: white; padding: 32px; border-radius: 12px; box-shadow: var(--shadow); text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 12px;">📱</div>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Điện thoại di động</h3>
+                    <p style="color: #6b7280; margin-bottom: 20px;">Các dòng iPhone, Samsung Galaxy mới nhất cùng nhiều tính năng vượt trội.</p>
+                    <a th:href="@{/products(categoryId=1)}" class="btn-primary" style="display: inline-block;">Xem điện thoại</a>
+                </div>
+
+                <div style="background: white; padding: 32px; border-radius: 12px; box-shadow: var(--shadow); text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 12px;">💻</div>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Máy tính bảng</h3>
+                    <p style="color: #6b7280; margin-bottom: 20px;">iPad Pro M4, Galaxy Tab mỏng nhẹ, phục vụ tối ưu cho học tập và đồ họa.</p>
+                    <a th:href="@{/products(categoryId=2)}" class="btn-primary" style="display: inline-block;">Xem máy tính bảng</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Bán Hàng Trực Tuyến - Bài Thực Hành 2 Spring Boot (saleappv1)</p>
+        </div>
+    </footer>
+
+</body>
+</html>
