@@ -1,70 +1,70 @@
 package com.example.saleappv1.model;
 
-public class Product {
-    private Integer id;
-    private String name;
-    private String description;
-    private Double price;
-    private String image;
-    private Integer categoryId;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
 
-    public Product() {
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "products")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 255)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(nullable = false)
+    private Double price;
+
+    private String image;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<OrderDetail> orderDetails = new ArrayList<>();
+
+    public Product(Long id, String name, String description, Double price, String image, Category category) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.image = image;
+        this.category = category;
     }
 
     public Product(Integer id, String name, String description, Double price, String image, Integer categoryId) {
-        this.id = id;
+        this.id = id != null ? id.longValue() : null;
         this.name = name;
         this.description = description;
         this.price = price;
         this.image = image;
-        this.categoryId = categoryId;
+        if (categoryId != null) {
+            this.category = new Category(categoryId.longValue(), null);
+        }
     }
 
-    public Integer getId() {
-        return id;
+    public Long getCategoryId() {
+        return category != null ? category.getId() : null;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public Integer getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryId(Long categoryId) {
+        if (categoryId != null) {
+            this.category = new Category(categoryId, null);
+        }
     }
 }

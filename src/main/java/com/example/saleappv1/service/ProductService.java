@@ -55,35 +55,49 @@ public class ProductService {
         return categories;
     }
 
-    public Category getCategoryById(Integer categoryId) {
+    public Category getCategoryById(Long categoryId) {
         if (categoryId == null) {
             return null;
         }
         return categories.stream()
-                .filter(cat -> categoryId.equals(cat.getId()))
+                .filter(cat -> cat.getId() != null && cat.getId().equals(categoryId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Category getCategoryById(Integer categoryId) {
+        if (categoryId == null) {
+            return null;
+        }
+        return getCategoryById(categoryId.longValue());
     }
 
     public List<Product> getAllProducts() {
         return new ArrayList<>(products);
     }
 
-    public Product getProductById(Integer id) {
+    public Product getProductById(Long id) {
         if (id == null) {
             return null;
         }
         return products.stream()
-                .filter(p -> id.equals(p.getId()))
+                .filter(p -> p.getId() != null && p.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
 
-    public List<Product> getProducts(Integer categoryId, String keyword, Double fromPrice, Double toPrice) {
+    public Product getProductById(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        return getProductById(id.longValue());
+    }
+
+    public List<Product> getProducts(Long categoryId, String keyword, Double fromPrice, Double toPrice) {
         return products.stream()
                 .filter(p -> {
                     // Lọc theo categoryId
-                    if (categoryId != null && !categoryId.equals(p.getCategoryId())) {
+                    if (categoryId != null && (p.getCategoryId() == null || !categoryId.equals(p.getCategoryId()))) {
                         return false;
                     }
                     // Tìm kiếm theo keyword trong tên sản phẩm (không phân biệt hoa thường)
@@ -103,5 +117,9 @@ public class ProductService {
                     return true;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public List<Product> getProducts(Integer categoryId, String keyword, Double fromPrice, Double toPrice) {
+        return getProducts(categoryId != null ? categoryId.longValue() : null, keyword, fromPrice, toPrice);
     }
 }
