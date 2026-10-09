@@ -9,37 +9,57 @@
 <section layout:fragment="content" class="container">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
-            <!-- Header Card -->
+            
+            <!-- Breadcrumb Navigation -->
             <div class="d-flex align-items-center justify-content-between mb-3">
-                <a th:href="@{/products}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+                <a th:href="@{/products}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 rounded-pill px-3">
                     <i class="bi bi-arrow-left"></i> Quay lại danh sách
                 </a>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill">Bài tập 4 - Spring Boot</span>
             </div>
 
+            <!-- Card Form -->
             <div class="card card-custom border-0 shadow-sm">
                 <div class="card-custom-header bg-white">
-                    <h4 class="fw-bold text-dark mb-1">Thêm Sản Phẩm Mới</h4>
-                    <p class="text-muted small mb-0">Điền thông tin chi tiết để thêm sản phẩm vào hệ thống</p>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="brand-logo-badge" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                            <i class="bi bi-plus-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold text-dark mb-0">Thêm Sản Phẩm Mới</h4>
+                            <p class="text-muted small mb-0">Điền thông tin và tải ảnh lên để lưu vào cơ sở dữ liệu</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-4">
+
+                <div class="card-body p-4 p-md-5">
                     <form th:action="@{/products/add}" th:object="${product}" method="post" enctype="multipart/form-data">
                         
+                        <!-- Product Name -->
                         <div class="mb-3">
-                            <label for="name" class="form-label fw-semibold text-secondary">Tên sản phẩm <span class="text-danger">*</span></label>
-                            <input type="text" th:field="*{name}" class="form-control form-control-lg fs-6" id="name" placeholder="Ví dụ: iPhone 15 Pro Max" required>
+                            <label for="name" class="form-label fw-semibold text-secondary">
+                                Tên sản phẩm <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" th:field="*{name}" class="form-control form-control-lg fs-6" id="name" placeholder="Ví dụ: iPhone 15 Pro Max 256GB" required>
                             <div class="text-danger small mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="price" class="form-label fw-semibold text-secondary">Giá bán (VNĐ) <span class="text-danger">*</span></label>
+                        <!-- Price & Category Grid -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="price" class="form-label fw-semibold text-secondary">
+                                    Giá bán (VNĐ) <span class="text-danger">*</span>
+                                </label>
                                 <div class="input-group">
-                                    <input type="number" step="0.01" th:field="*{price}" class="form-control" id="price" placeholder="Nhập giá bán" required>
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-cash-stack"></i></span>
+                                    <input type="number" step="0.01" th:field="*{price}" class="form-control" id="price" placeholder="25000000" required>
                                     <span class="input-group-text bg-light text-muted">VNĐ</span>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="category" class="form-label fw-semibold text-secondary">Danh mục <span class="text-danger">*</span></label>
+                            <div class="col-md-6">
+                                <label for="category" class="form-label fw-semibold text-secondary">
+                                    Danh mục sản phẩm <span class="text-danger">*</span>
+                                </label>
                                 <select th:field="*{category}" class="form-select" id="category" required>
                                     <option value="" disabled selected>-- Chọn danh mục --</option>
                                     <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
@@ -47,32 +67,52 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="imageFile" class="form-label fw-semibold text-secondary">Hình ảnh sản phẩm</label>
-                            <div class="border rounded-3 p-3 bg-light">
-                                <label class="form-label small text-muted mb-1"><i class="bi bi-upload me-1"></i> Tải ảnh lên từ thiết bị:</label>
-                                <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*">
+                        <!-- Image Upload Box with Instant Preview -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-secondary">Hình ảnh sản phẩm</label>
+                            <div class="border rounded-4 p-4 bg-light text-center" id="uploadZone">
                                 
-                                <div class="d-flex align-items-center my-2 text-muted small">
+                                <!-- Preview Container -->
+                                <div id="previewContainer" class="d-none mb-3">
+                                    <img id="imagePreview" src="" alt="Xem trước ảnh" class="rounded-3 shadow border" style="max-height: 160px; object-fit: contain;">
+                                    <div class="mt-2 text-muted small" id="imageFileName"></div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <i class="bi bi-cloud-arrow-up text-primary display-6 d-block mb-1"></i>
+                                    <label for="imageFile" class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-medium cursor-pointer">
+                                        <i class="bi bi-folder2-open me-1"></i> Chọn file ảnh từ máy
+                                    </label>
+                                    <input type="file" name="imageFile" id="imageFile" class="d-none" accept="image/*" onchange="handleFileSelect(this)">
+                                </div>
+                                <div class="text-muted small">Định dạng hỗ trợ: JPG, PNG, WEBP, GIF</div>
+
+                                <div class="d-flex align-items-center my-3 text-muted small">
                                     <div class="border-top flex-grow-1"></div>
-                                    <span class="px-2">hoặc</span>
+                                    <span class="px-3">hoặc đường dẫn có sẵn</span>
                                     <div class="border-top flex-grow-1"></div>
                                 </div>
-                                
-                                <label class="form-label small text-muted mb-1"><i class="bi bi-link-45deg me-1"></i> Đường dẫn ảnh (tùy chọn):</label>
-                                <input type="text" th:field="*{image}" class="form-control form-control-sm" placeholder="Ví dụ: /images/iphone-14.jpg">
+
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="text" th:field="*{image}" id="imageUrlInput" class="form-control" placeholder="Ví dụ: /images/iphone-14.jpg" oninput="handleUrlInput(this)">
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Description -->
                         <div class="mb-4">
-                            <label for="description" class="form-label fw-semibold text-secondary">Mô tả sản phẩm <span class="text-danger">*</span></label>
-                            <textarea th:field="*{description}" class="form-control" id="description" rows="3" placeholder="Nhập mô tả chi tiết về sản phẩm..." required></textarea>
+                            <label for="description" class="form-label fw-semibold text-secondary">
+                                Mô tả chi tiết sản phẩm <span class="text-danger">*</span>
+                            </label>
+                            <textarea th:field="*{description}" class="form-control" id="description" rows="3" placeholder="Nhập thông tin mô tả chi tiết tính năng, thông số sản phẩm..." required></textarea>
                         </div>
 
+                        <!-- Actions -->
                         <div class="d-flex gap-2 justify-content-end pt-3 border-top">
-                            <a th:href="@{/products}" class="btn btn-outline-secondary px-4">Hủy bỏ</a>
-                            <button type="submit" class="btn btn-primary px-4 d-inline-flex align-items-center gap-2">
-                                <i class="bi bi-check2-circle"></i> Lưu Sản Phẩm
+                            <a th:href="@{/products}" class="btn btn-outline-secondary px-4 rounded-pill">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary px-4 rounded-pill fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
+                                <i class="bi bi-check2-circle"></i> Xác Nhận Lưu
                             </button>
                         </div>
                     </form>
@@ -80,6 +120,37 @@
             </div>
         </div>
     </div>
+
+    <!-- Live Preview Script -->
+    <script>
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    const container = document.getElementById('previewContainer');
+                    const nameLabel = document.getElementById('imageFileName');
+                    preview.src = e.target.result;
+                    nameLabel.textContent = file.name + ' (' + Math.round(file.size / 1024) + ' KB)';
+                    container.classList.remove('d-none');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleUrlInput(input) {
+            const val = input.value.trim();
+            if (val) {
+                const preview = document.getElementById('imagePreview');
+                const container = document.getElementById('previewContainer');
+                const nameLabel = document.getElementById('imageFileName');
+                preview.src = val;
+                nameLabel.textContent = 'Link ảnh: ' + val;
+                container.classList.remove('d-none');
+            }
+        }
+    </script>
 </section>
 </body>
 </html>

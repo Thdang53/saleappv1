@@ -6,44 +6,95 @@
     <title>Danh Sách Danh Mục</title>
 </head>
 <body>
-<section layout:fragment="content" class="container">
-    <!-- Header Section -->
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-        <div>
-            <h2 class="fw-bold text-dark mb-1">Danh Sách Danh Mục</h2>
-            <p class="text-muted small mb-0">Quản lý và phân nhóm các loại sản phẩm</p>
+<section layout:fragment="content" class="container-fluid max-w-7xl px-lg-4">
+
+    <!-- KPI Summary Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider">Tổng Danh Mục</div>
+                    <div class="fs-3 fw-bold text-dark mt-1" th:text="${#lists.size(categories)}">0</div>
+                    <div class="small text-success mt-1"><i class="bi bi-check2-circle"></i> Đang kích hoạt</div>
+                </div>
+                <div class="stat-icon bg-primary-subtle text-primary">
+                    <i class="bi bi-folder-fill"></i>
+                </div>
+            </div>
         </div>
-        <div>
-            <a th:href="@{/categories/add}" class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium shadow-sm">
-                <i class="bi bi-plus-circle"></i> Thêm Danh Mục Mới
-            </a>
+        <div class="col-12 col-md-4">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider">Cấu Trúc Danh Mục</div>
+                    <div class="fs-3 fw-bold text-dark mt-1">Chuẩn JPA 3.0</div>
+                    <div class="small text-info mt-1"><i class="bi bi-diagram-2"></i> Category Entity</div>
+                </div>
+                <div class="stat-icon bg-info-subtle text-info">
+                    <i class="bi bi-diagram-3-fill"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider">Thao Tác Dữ Liệu</div>
+                    <div class="fs-3 fw-bold text-dark mt-1">CRUD Đầy Đủ</div>
+                    <div class="small text-success mt-1"><i class="bi bi-shield-lock-fill"></i> Giao dịch Transactional</div>
+                </div>
+                <div class="stat-icon bg-success-subtle text-success">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Table Card -->
+    <!-- Main Card -->
     <div class="card card-custom border-0 shadow-sm">
+        <div class="card-custom-header bg-white">
+            <div class="row g-3 align-items-center justify-content-between">
+                <div class="col-12 col-md-6">
+                    <h4 class="fw-bold text-dark mb-1">Quản Lý Danh Mục</h4>
+                    <p class="text-muted small mb-0">Danh sách các nhóm sản phẩm trong hệ thống</p>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="d-flex flex-wrap align-items-center justify-content-md-end gap-2">
+                        <!-- Search Category -->
+                        <div class="input-group" style="max-width: 250px;">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" id="catSearchInput" class="form-control bg-light border-start-0 ps-0" placeholder="Lọc danh mục...">
+                        </div>
+                        <a th:href="@{/categories/add}" class="btn btn-primary d-inline-flex align-items-center gap-2 fw-semibold px-3">
+                            <i class="bi bi-plus-circle"></i> Thêm Danh Mục Mới
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-custom table-hover align-middle mb-0">
                 <thead>
                     <tr>
-                        <th style="width: 90px;" class="text-center">ID</th>
+                        <th style="width: 80px;" class="text-center">ID</th>
                         <th>Tên Danh Mục</th>
-                        <th style="width: 180px;" class="text-center">Hành Động</th>
+                        <th style="width: 180px;" class="text-center">Thao Tác</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="catTableBody">
                     <tr th:if="${#lists.isEmpty(categories)}">
                         <td colspan="3" class="text-center py-5 text-muted">
                             <i class="bi bi-folder-x fs-1 d-block mb-2 text-secondary"></i>
                             Chưa có danh mục nào. Hãy bấm "Thêm Danh Mục Mới" để tạo!
                         </td>
                     </tr>
-                    <tr th:each="category : ${categories}">
-                        <td class="text-center fw-medium text-secondary" th:text="${category.id}">1</td>
+                    <tr th:each="category : ${categories}" class="cat-item-row" th:data-name="${category.name}">
+                        <td class="text-center fw-bold text-secondary" th:text="'#' + ${category.id}">#1</td>
                         <td>
-                            <div class="fw-semibold text-dark d-flex align-items-center gap-2">
-                                <i class="bi bi-tag text-primary"></i>
-                                <span th:text="${category.name}">Tên danh mục</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary-subtle text-primary p-2 rounded-3">
+                                    <i class="bi bi-tag-fill"></i>
+                                </span>
+                                <span class="fw-bold text-dark fs-6" th:text="${category.name}">Tên danh mục</span>
                             </div>
                         </td>
                         <td class="text-center">
@@ -66,6 +117,24 @@
             </table>
         </div>
     </div>
+
+    <!-- Live Category Filter Script -->
+    <script>
+        const catSearchInput = document.getElementById('catSearchInput');
+        const catRows = document.querySelectorAll('.cat-item-row');
+
+        catSearchInput.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            catRows.forEach(row => {
+                const name = (row.getAttribute('data-name') || '').toLowerCase();
+                if (!query || name.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </section>
 </body>
 </html>

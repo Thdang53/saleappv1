@@ -6,23 +6,109 @@
     <title>Danh Sách Sản Phẩm</title>
 </head>
 <body>
-<section layout:fragment="content" class="container">
-    <!-- Header Section -->
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-        <div>
-            <h2 class="fw-bold text-dark mb-1">Danh Sách Sản Phẩm</h2>
-            <p class="text-muted small mb-0">Quản lý thông tin, danh mục, giá bán và hình ảnh các sản phẩm</p>
+<section layout:fragment="content" class="container-fluid max-w-7xl px-lg-4">
+
+    <!-- KPI Summary Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider">Tổng Sản Phẩm</div>
+                    <div class="fs-3 fw-bold text-dark mt-1" th:text="${#lists.size(products)}">0</div>
+                    <div class="small text-success mt-1"><i class="bi bi-arrow-up-short"></i> Đang hoạt động</div>
+                </div>
+                <div class="stat-icon bg-primary-subtle text-primary">
+                    <i class="bi bi-box-seam-fill"></i>
+                </div>
+            </div>
         </div>
-        <div>
-            <a th:href="@{/products/add}" class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium shadow-sm">
-                <i class="bi bi-plus-circle"></i> Thêm Sản Phẩm Mới
-            </a>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider">Hệ Thống Phân Loại</div>
+                    <div class="fs-3 fw-bold text-dark mt-1">Chuẩn JPA</div>
+                    <div class="small text-primary mt-1"><i class="bi bi-diagram-3-fill"></i> Quan hệ 1-N</div>
+                </div>
+                <div class="stat-icon bg-success-subtle text-success">
+                    <i class="bi bi-tags-fill"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider">Hình Ảnh Sản Phẩm</div>
+                    <div class="fs-3 fw-bold text-dark mt-1">Đa Phương Tiện</div>
+                    <div class="small text-info mt-1"><i class="bi bi-cloud-arrow-up-fill"></i> Upload & URL</div>
+                </div>
+                <div class="stat-icon bg-info-subtle text-info">
+                    <i class="bi bi-image-fill"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider">Cơ Sở Dữ Liệu</div>
+                    <div class="fs-3 fw-bold text-dark mt-1">MySQL / H2</div>
+                    <div class="small text-success mt-1"><i class="bi bi-shield-check"></i> Tự động đồng bộ</div>
+                </div>
+                <div class="stat-icon bg-warning-subtle text-warning">
+                    <i class="bi bi-database-fill-check"></i>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Table Card -->
+    <!-- Main Content Card -->
     <div class="card card-custom border-0 shadow-sm">
-        <div class="table-responsive">
+        
+        <!-- Toolbar Header -->
+        <div class="card-custom-header bg-white">
+            <div class="row g-3 align-items-center justify-content-between">
+                <div class="col-12 col-lg-4">
+                    <h4 class="fw-bold text-dark mb-1">Kho Hàng & Sản Phẩm</h4>
+                    <p class="text-muted small mb-0">Quản lý danh sách, tìm kiếm và phân loại sản phẩm</p>
+                </div>
+
+                <div class="col-12 col-lg-8">
+                    <div class="d-flex flex-wrap align-items-center justify-content-lg-end gap-2">
+                        <!-- Live Search -->
+                        <div class="input-group" style="max-width: 260px;">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" id="liveSearchInput" class="form-control bg-light border-start-0 ps-0" placeholder="Tìm kiếm tên sản phẩm...">
+                        </div>
+
+                        <!-- Live Category Filter -->
+                        <select id="liveCategoryFilter" class="form-select bg-light" style="max-width: 200px;">
+                            <option value="">Tất cả danh mục</option>
+                            <option th:each="product : ${products}"
+                                    th:if="${product.category != null}"
+                                    th:value="${product.category.name}"
+                                    th:text="${product.category.name}"></option>
+                        </select>
+
+                        <!-- View Mode Toggle -->
+                        <div class="btn-group" role="group" aria-label="View toggle">
+                            <button type="button" id="btnViewTable" class="btn btn-outline-secondary active" title="Dạng Bảng">
+                                <i class="bi bi-table"></i>
+                            </button>
+                            <button type="button" id="btnViewGrid" class="btn btn-outline-secondary" title="Dạng Thẻ Lưới">
+                                <i class="bi bi-grid-3x3-gap"></i>
+                            </button>
+                        </div>
+
+                        <!-- Add Button -->
+                        <a th:href="@{/products/add}" class="btn btn-primary d-inline-flex align-items-center gap-2 fw-semibold px-3">
+                            <i class="bi bi-plus-circle"></i> Thêm Mới
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. Table View -->
+        <div id="tableViewContainer" class="table-responsive">
             <table class="table table-custom table-hover align-middle mb-0">
                 <thead>
                     <tr>
@@ -31,48 +117,52 @@
                         <th>Tên Sản Phẩm</th>
                         <th>Danh Mục</th>
                         <th>Giá Bán</th>
-                        <th>Mô Tả</th>
-                        <th style="width: 160px;" class="text-center">Hành Động</th>
+                        <th>Mô Tả Chi Tiết</th>
+                        <th style="width: 160px;" class="text-center">Thao Tác</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="productTableBody">
                     <tr th:if="${#lists.isEmpty(products)}">
                         <td colspan="7" class="text-center py-5 text-muted">
                             <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
-                            Chưa có sản phẩm nào. Hãy bấm "Thêm Sản Phẩm Mới" để bắt đầu!
+                            Chưa có sản phẩm nào. Hãy bấm "Thêm Mới" để tạo sản phẩm đầu tiên!
                         </td>
                     </tr>
-                    <tr th:each="product : ${products}">
-                        <td class="text-center fw-medium text-secondary" th:text="${product.id}">1</td>
+                    <tr th:each="product : ${products}" class="product-item-row"
+                        th:data-name="${product.name}"
+                        th:data-category="${product.category != null ? product.category.name : ''}">
+                        <td class="text-center fw-bold text-secondary" th:text="'#' + ${product.id}">#1</td>
                         <td class="text-center">
                             <div th:if="${product.image != null and !product.image.isEmpty()}">
                                 <img th:src="${product.image}"
-                                     alt="Ảnh sản phẩm"
-                                     class="rounded-3 border shadow-sm"
-                                     style="width: 60px; height: 60px; object-fit: cover;" />
+                                     th:alt="${product.name}"
+                                     class="rounded-3 border shadow-sm product-zoom-img"
+                                     style="width: 58px; height: 58px; object-fit: cover; cursor: pointer;"
+                                     th:onclick="openImageModal(this.src, '[[${product.name}]]')" />
                             </div>
                             <div th:if="${product.image == null or product.image.isEmpty()}"
                                  class="rounded-3 border bg-light d-inline-flex align-items-center justify-content-center text-muted"
-                                 style="width: 60px; height: 60px;">
+                                 style="width: 58px; height: 58px;">
                                 <i class="bi bi-image text-secondary fs-4"></i>
                             </div>
                         </td>
                         <td>
-                            <div class="fw-semibold text-dark" th:text="${product.name}">Tên sản phẩm</div>
+                            <div class="fw-bold text-dark fs-6" th:text="${product.name}">Tên sản phẩm</div>
+                            <div class="small text-muted d-block d-md-none" th:text="${product.category != null ? product.category.name : ''}"></div>
                         </td>
                         <td>
                             <span th:if="${product.category != null}"
-                                  class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1"
+                                  class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 fw-semibold"
                                   th:text="${product.category.name}">Danh mục</span>
                             <span th:if="${product.category == null}"
                                   class="badge bg-secondary-subtle text-secondary px-2 py-1">Chưa phân loại</span>
                         </td>
                         <td>
-                            <span class="fw-bold text-danger"
+                            <span class="fw-bold text-danger fs-6"
                                   th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">20,000,000 VNĐ</span>
                         </td>
                         <td>
-                            <div class="text-secondary small text-truncate" style="max-width: 250px;" th:text="${product.description}">Mô tả ngắn</div>
+                            <div class="text-secondary small text-truncate" style="max-width: 260px;" th:text="${product.description}">Mô tả ngắn</div>
                         </td>
                         <td class="text-center">
                             <div class="btn-group" role="group">
@@ -93,7 +183,171 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- 2. Grid Cards View -->
+        <div id="gridViewContainer" class="p-4 d-none">
+            <div class="row g-4" id="productGridRow">
+                <div th:each="product : ${products}" class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item-card"
+                     th:data-name="${product.name}"
+                     th:data-category="${product.category != null ? product.category.name : ''}">
+                    <div class="product-card h-100">
+                        <div class="product-card-img-wrap position-relative">
+                            <img th:if="${product.image != null and !product.image.isEmpty()}"
+                                 th:src="${product.image}"
+                                 th:alt="${product.name}"
+                                 class="product-card-img"
+                                 style="cursor: pointer;"
+                                 th:onclick="openImageModal(this.src, '[[${product.name}]]')" />
+                            <div th:if="${product.image == null or product.image.isEmpty()}"
+                                 class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-secondary">
+                                <i class="bi bi-image fs-1"></i>
+                            </div>
+                            <span th:if="${product.category != null}"
+                                  class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-75 text-white backdrop-blur px-2.5 py-1.5"
+                                  th:text="${product.category.name}">Danh mục</span>
+                        </div>
+                        <div class="p-3 flex-grow-1 d-flex flex-column">
+                            <h5 class="fw-bold text-dark mb-1 text-truncate" th:text="${product.name}">Tên sản phẩm</h5>
+                            <div class="fs-5 fw-bold text-danger mb-2"
+                                 th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">20,000,000 VNĐ</div>
+                            <p class="text-muted small flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" th:text="${product.description}">Mô tả ngắn</p>
+                            <div class="d-flex gap-2 pt-3 border-top mt-auto">
+                                <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-outline-primary btn-sm flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1">
+                                    <i class="bi bi-pencil-square"></i> Sửa
+                                </a>
+                                <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-outline-danger btn-sm flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1"
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
+                                    <i class="bi bi-trash3"></i> Xóa
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Filter Results Message -->
+        <div id="noResultsMsg" class="d-none text-center py-5">
+            <i class="bi bi-search fs-1 text-secondary d-block mb-2"></i>
+            <h5 class="fw-semibold text-dark">Không tìm thấy sản phẩm phù hợp</h5>
+            <p class="text-muted small">Hãy thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc danh mục.</p>
+        </div>
+
     </div>
+
+    <!-- Image Zoom Modal -->
+    <div class="modal fade" id="imageZoomModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark" id="modalImageTitle">Chi tiết hình ảnh</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <img id="modalImageSrc" src="" alt="Ảnh sản phẩm" class="img-fluid rounded-3 shadow border" style="max-height: 520px; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client-side Interactive Script -->
+    <script>
+        // Toggle Table vs Grid View
+        const btnViewTable = document.getElementById('btnViewTable');
+        const btnViewGrid = document.getElementById('btnViewGrid');
+        const tableViewContainer = document.getElementById('tableViewContainer');
+        const gridViewContainer = document.getElementById('gridViewContainer');
+
+        btnViewTable.addEventListener('click', () => {
+            btnViewTable.classList.add('active');
+            btnViewGrid.classList.remove('active');
+            tableViewContainer.classList.remove('d-none');
+            gridViewContainer.classList.add('d-none');
+        });
+
+        btnViewGrid.addEventListener('click', () => {
+            btnViewGrid.classList.add('active');
+            btnViewTable.classList.remove('active');
+            tableViewContainer.classList.add('d-none');
+            gridViewContainer.classList.remove('d-none');
+        });
+
+        // Deduplicate category filter options
+        const catSelect = document.getElementById('liveCategoryFilter');
+        const seenCats = new Set();
+        Array.from(catSelect.options).forEach((opt, idx) => {
+            if (idx === 0) return;
+            if (seenCats.has(opt.value)) {
+                opt.remove();
+            } else {
+                seenCats.add(opt.value);
+            }
+        });
+
+        // Live Search & Filter
+        const searchInput = document.getElementById('liveSearchInput');
+        const categoryFilter = document.getElementById('liveCategoryFilter');
+        const tableRows = document.querySelectorAll('.product-item-row');
+        const gridCards = document.querySelectorAll('.product-item-card');
+        const noResultsMsg = document.getElementById('noResultsMsg');
+
+        function filterProducts() {
+            const query = searchInput.value.trim().toLowerCase();
+            const cat = categoryFilter.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            tableRows.forEach(row => {
+                const name = (row.getAttribute('data-name') || '').toLowerCase();
+                const category = (row.getAttribute('data-category') || '').toLowerCase();
+                const matchQuery = !query || name.includes(query);
+                const matchCat = !cat || category === cat;
+
+                if (matchQuery && matchCat) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            gridCards.forEach(card => {
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                const category = (card.getAttribute('data-category') || '').toLowerCase();
+                const matchQuery = !query || name.includes(query);
+                const matchCat = !cat || category === cat;
+
+                if (matchQuery && matchCat) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0 && (tableRows.length > 0)) {
+                noResultsMsg.classList.remove('d-none');
+                tableViewContainer.classList.add('d-none');
+                gridViewContainer.classList.add('d-none');
+            } else {
+                noResultsMsg.classList.add('d-none');
+                if (btnViewTable.classList.contains('active')) {
+                    tableViewContainer.classList.remove('d-none');
+                } else {
+                    gridViewContainer.classList.remove('d-none');
+                }
+            }
+        }
+
+        searchInput.addEventListener('input', filterProducts);
+        categoryFilter.addEventListener('change', filterProducts);
+
+        // Open Image Lightbox Modal
+        function openImageModal(src, title) {
+            document.getElementById('modalImageSrc').src = src;
+            document.getElementById('modalImageTitle').textContent = title || 'Chi tiết hình ảnh';
+            const modal = new bootstrap.Modal(document.getElementById('imageZoomModal'));
+            modal.show();
+        }
+    </script>
 </section>
 </body>
 </html>

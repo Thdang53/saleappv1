@@ -9,38 +9,57 @@
 <section layout:fragment="content" class="container">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
-            <!-- Back Navigation -->
+            
+            <!-- Breadcrumb Navigation -->
             <div class="d-flex align-items-center justify-content-between mb-3">
-                <a th:href="@{/products}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+                <a th:href="@{/products}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 rounded-pill px-3">
                     <i class="bi bi-arrow-left"></i> Quay lại danh sách
                 </a>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill" th:text="'ID Sản phẩm: #' + ${product.id}">#1</span>
             </div>
 
-            <!-- Form Card -->
+            <!-- Card Form -->
             <div class="card card-custom border-0 shadow-sm">
                 <div class="card-custom-header bg-white">
-                    <h4 class="fw-bold text-dark mb-1">Cập Nhật Sản Phẩm</h4>
-                    <p class="text-muted small mb-0">Chỉnh sửa thông tin, giá cả và hình ảnh sản phẩm</p>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="brand-logo-badge" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                            <i class="bi bi-pencil-square"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold text-dark mb-0">Cập Nhật Thông Tin Sản Phẩm</h4>
+                            <p class="text-muted small mb-0">Chỉnh sửa thông tin, giá bán, danh mục và hình ảnh sản phẩm</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-4">
+
+                <div class="card-body p-4 p-md-5">
                     <form th:action="@{/products/update/{id}(id=${product.id})}" th:object="${product}" method="post" enctype="multipart/form-data">
                         
+                        <!-- Product Name -->
                         <div class="mb-3">
-                            <label for="name" class="form-label fw-semibold text-secondary">Tên sản phẩm <span class="text-danger">*</span></label>
+                            <label for="name" class="form-label fw-semibold text-secondary">
+                                Tên sản phẩm <span class="text-danger">*</span>
+                            </label>
                             <input type="text" th:field="*{name}" class="form-control form-control-lg fs-6" id="name" required>
                             <div class="text-danger small mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="price" class="form-label fw-semibold text-secondary">Giá bán (VNĐ) <span class="text-danger">*</span></label>
+                        <!-- Price & Category Grid -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="price" class="form-label fw-semibold text-secondary">
+                                    Giá bán (VNĐ) <span class="text-danger">*</span>
+                                </label>
                                 <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="bi bi-cash-stack"></i></span>
                                     <input type="number" step="0.01" th:field="*{price}" class="form-control" id="price" required>
                                     <span class="input-group-text bg-light text-muted">VNĐ</span>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="category" class="form-label fw-semibold text-secondary">Danh mục <span class="text-danger">*</span></label>
+                            <div class="col-md-6">
+                                <label for="category" class="form-label fw-semibold text-secondary">
+                                    Danh mục sản phẩm <span class="text-danger">*</span>
+                                </label>
                                 <select th:field="*{category}" class="form-select" id="category">
                                     <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
                                             th:selected="${product.category != null and cat.id == product.category.id}"></option>
@@ -48,41 +67,57 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="imageFile" class="form-label fw-semibold text-secondary">Hình ảnh sản phẩm</label>
-                            <div class="border rounded-3 p-3 bg-light">
-                                <!-- Preview of current image if exists -->
-                                <div th:if="${product.image != null and !product.image.isEmpty()}" class="d-flex align-items-center gap-3 mb-3 p-2 bg-white rounded border">
-                                    <img th:src="${product.image}" alt="Ảnh hiện tại" class="rounded border" style="width: 70px; height: 70px; object-fit: cover;">
-                                    <div>
-                                        <div class="fw-medium text-dark small">Ảnh hiện tại đang sử dụng:</div>
-                                        <div class="text-muted small text-break" th:text="${product.image}"></div>
-                                    </div>
+                        <!-- Image Section with Current Thumbnail & Live Upload Preview -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-secondary">Hình ảnh sản phẩm</label>
+                            <div class="border rounded-4 p-4 bg-light text-center">
+                                
+                                <!-- Current / Preview Image Display -->
+                                <div id="previewContainer" class="mb-3">
+                                    <img id="imagePreview"
+                                         th:src="${product.image != null and !product.image.isEmpty() ? product.image : ''}"
+                                         th:classappend="${product.image == null or product.image.isEmpty() ? 'd-none' : ''}"
+                                         alt="Ảnh hiện tại"
+                                         class="rounded-3 shadow border"
+                                         style="max-height: 160px; object-fit: contain;">
+                                    <div class="mt-2 text-muted small" id="imageFileName"
+                                         th:text="${product.image != null and !product.image.isEmpty() ? 'Đường dẫn hiện tại: ' + product.image : ''}"></div>
                                 </div>
 
-                                <label class="form-label small text-muted mb-1"><i class="bi bi-upload me-1"></i> Tải ảnh mới lên thay thế:</label>
-                                <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*">
-                                
-                                <div class="d-flex align-items-center my-2 text-muted small">
+                                <div class="mb-2">
+                                    <label for="imageFile" class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-medium cursor-pointer">
+                                        <i class="bi bi-cloud-arrow-up me-1"></i> Tải ảnh mới thay thế
+                                    </label>
+                                    <input type="file" name="imageFile" id="imageFile" class="d-none" accept="image/*" onchange="handleFileSelect(this)">
+                                </div>
+                                <div class="text-muted small">Nếu không chọn ảnh mới, hệ thống sẽ giữ nguyên ảnh hiện tại</div>
+
+                                <div class="d-flex align-items-center my-3 text-muted small">
                                     <div class="border-top flex-grow-1"></div>
-                                    <span class="px-2">hoặc</span>
+                                    <span class="px-3">hoặc sửa đường dẫn</span>
                                     <div class="border-top flex-grow-1"></div>
                                 </div>
-                                
-                                <label class="form-label small text-muted mb-1"><i class="bi bi-link-45deg me-1"></i> Đường dẫn ảnh:</label>
-                                <input type="text" th:field="*{image}" class="form-control form-control-sm" placeholder="Ví dụ: /images/iphone-14.jpg">
+
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="text" th:field="*{image}" id="imageUrlInput" class="form-control" placeholder="Ví dụ: /images/iphone-14.jpg" oninput="handleUrlInput(this)">
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Description -->
                         <div class="mb-4">
-                            <label for="description" class="form-label fw-semibold text-secondary">Mô tả sản phẩm <span class="text-danger">*</span></label>
+                            <label for="description" class="form-label fw-semibold text-secondary">
+                                Mô tả chi tiết sản phẩm <span class="text-danger">*</span>
+                            </label>
                             <textarea th:field="*{description}" class="form-control" id="description" rows="3" required></textarea>
                         </div>
 
+                        <!-- Actions -->
                         <div class="d-flex gap-2 justify-content-end pt-3 border-top">
-                            <a th:href="@{/products}" class="btn btn-outline-secondary px-4">Hủy bỏ</a>
-                            <button type="submit" class="btn btn-primary px-4 d-inline-flex align-items-center gap-2">
-                                <i class="bi bi-save"></i> Lưu Thay Đổi
+                            <a th:href="@{/products}" class="btn btn-outline-secondary px-4 rounded-pill">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary px-4 rounded-pill fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
+                                <i class="bi bi-save"></i> Cập Nhật Thay Đổi
                             </button>
                         </div>
                     </form>
@@ -90,6 +125,35 @@
             </div>
         </div>
     </div>
+
+    <!-- Live Preview Script -->
+    <script>
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    const nameLabel = document.getElementById('imageFileName');
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    nameLabel.textContent = 'Ảnh mới: ' + file.name + ' (' + Math.round(file.size / 1024) + ' KB)';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleUrlInput(input) {
+            const val = input.value.trim();
+            if (val) {
+                const preview = document.getElementById('imagePreview');
+                const nameLabel = document.getElementById('imageFileName');
+                preview.src = val;
+                preview.classList.remove('d-none');
+                nameLabel.textContent = 'Link ảnh: ' + val;
+            }
+        }
+    </script>
 </section>
 </body>
 </html>
