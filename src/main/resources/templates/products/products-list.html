@@ -12,10 +12,11 @@
     <div class="mb-3">
         <a th:href="@{/products/add}" class="btn btn-primary">Thêm Sản Phẩm Mới</a>
     </div>
-    <table class="table table-bordered table-hover">
+    <table class="table table-bordered table-hover align-middle">
         <thead class="table-dark">
             <tr>
                 <th>ID</th>
+                <th>Hình Ảnh</th>
                 <th>Tên Sản Phẩm</th>
                 <th>Giá Cả</th>
                 <th>Mô Tả</th>
@@ -26,6 +27,15 @@
         <tbody>
             <tr th:each="product : ${products}">
                 <td th:text="${product.id}"></td>
+                <td>
+                    <img th:if="${product.image != null and !product.image.isEmpty()}"
+                         th:src="${product.image}"
+                         alt="Ảnh sản phẩm"
+                         style="max-width: 80px; max-height: 80px; object-fit: cover;"
+                         class="img-thumbnail" />
+                    <span th:if="${product.image == null or product.image.isEmpty()}"
+                          class="text-muted fst-italic">Không có ảnh</span>
+                </td>
                 <td th:text="${product.name}"></td>
                 <td th:text="${product.price}"></td>
                 <td th:text="${product.description}"></td>

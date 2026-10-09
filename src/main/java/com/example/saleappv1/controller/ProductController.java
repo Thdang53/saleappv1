@@ -35,10 +35,31 @@ public class ProductController {
     }
 
     @PostMapping("/add")
-    public String addProduct(@Valid Product product, BindingResult result, Model model) {
+    public String addProduct(@Valid Product product, BindingResult result,
+                             @RequestParam(value = "imageFile", required = false) org.springframework.web.multipart.MultipartFile imageFile,
+                             Model model) {
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.getAllCategories()); // Nạp lại danh mục nếu form lỗi
             return "/products/add-product";
+        }
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                String originalFilename = org.springframework.util.StringUtils.cleanPath(imageFile.getOriginalFilename());
+                String fileName = java.util.UUID.randomUUID().toString().substring(0, 8) + "_" + originalFilename;
+                java.nio.file.Path uploadDir = java.nio.file.Paths.get("src/main/resources/static/images");
+                if (!java.nio.file.Files.exists(uploadDir)) {
+                    java.nio.file.Files.createDirectories(uploadDir);
+                }
+                java.nio.file.Files.copy(imageFile.getInputStream(), uploadDir.resolve(fileName), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                java.nio.file.Path targetDir = java.nio.file.Paths.get("target/classes/static/images");
+                if (java.nio.file.Files.exists(targetDir)) {
+                    java.nio.file.Files.copy(imageFile.getInputStream(), targetDir.resolve(fileName), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                }
+                product.setImage("/images/" + fileName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         productService.addProduct(product);
         return "redirect:/products";
@@ -54,11 +75,38 @@ public class ProductController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateProduct(@PathVariable Long id, @Valid Product product, BindingResult result, Model model) {
+    public String updateProduct(@PathVariable Long id, @Valid Product product, BindingResult result,
+                                @RequestParam(value = "imageFile", required = false) org.springframework.web.multipart.MultipartFile imageFile,
+                                Model model) {
         if (result.hasErrors()) {
             product.setId(id);
             model.addAttribute("categories", categoryService.getAllCategories());
             return "/products/update-product";
+        }
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                String originalFilename = org.springframework.util.StringUtils.cleanPath(imageFile.getOriginalFilename());
+                String fileName = java.util.UUID.randomUUID().toString().substring(0, 8) + "_" + originalFilename;
+                java.nio.file.Path uploadDir = java.nio.file.Paths.get("src/main/resources/static/images");
+                if (!java.nio.file.Files.exists(uploadDir)) {
+                    java.nio.file.Files.createDirectories(uploadDir);
+                }
+                java.nio.file.Files.copy(imageFile.getInputStream(), uploadDir.resolve(fileName), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                java.nio.file.Path targetDir = java.nio.file.Paths.get("target/classes/static/images");
+                if (java.nio.file.Files.exists(targetDir)) {
+                    java.nio.file.Files.copy(imageFile.getInputStream(), targetDir.resolve(fileName), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                }
+                product.setImage("/images/" + fileName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            productService.getProductById(id).ifPresent(old -> {
+                if (product.getImage() == null || product.getImage().isEmpty()) {
+                    product.setImage(old.getImage());
+                }
+            });
         }
         productService.updateProduct(product);
         return "redirect:/products";
