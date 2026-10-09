@@ -4,50 +4,96 @@
       layout:decorate="~{layout}">
 <head>
     <title>Danh Sách Sản Phẩm</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
-<section layout:fragment="content" class="container mt-4">
-    <h1 class="mb-3">Danh Sách Sản Phẩm</h1>
-    <div class="mb-3">
-        <a th:href="@{/products/add}" class="btn btn-primary">Thêm Sản Phẩm Mới</a>
+<section layout:fragment="content" class="container">
+    <!-- Header Section -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Danh Sách Sản Phẩm</h2>
+            <p class="text-muted small mb-0">Quản lý thông tin, danh mục, giá bán và hình ảnh các sản phẩm</p>
+        </div>
+        <div>
+            <a th:href="@{/products/add}" class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium shadow-sm">
+                <i class="bi bi-plus-circle"></i> Thêm Sản Phẩm Mới
+            </a>
+        </div>
     </div>
-    <table class="table table-bordered table-hover align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Hình Ảnh</th>
-                <th>Tên Sản Phẩm</th>
-                <th>Giá Cả</th>
-                <th>Mô Tả</th>
-                <th>Danh Mục</th>
-                <th>Hành Động</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="product : ${products}">
-                <td th:text="${product.id}"></td>
-                <td>
-                    <img th:if="${product.image != null and !product.image.isEmpty()}"
-                         th:src="${product.image}"
-                         alt="Ảnh sản phẩm"
-                         style="max-width: 80px; max-height: 80px; object-fit: cover;"
-                         class="img-thumbnail" />
-                    <span th:if="${product.image == null or product.image.isEmpty()}"
-                          class="text-muted fst-italic">Không có ảnh</span>
-                </td>
-                <td th:text="${product.name}"></td>
-                <td th:text="${product.price}"></td>
-                <td th:text="${product.description}"></td>
-                <td th:text="${product.category != null ? product.category.name : ''}"></td>
-                <td>
-                    <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-success btn-sm">Sửa</a>
-                    <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-danger btn-sm"
-                       onclick="return confirm('Bạn có chắc chắn muốn xóa không?')">Xóa</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+
+    <!-- Table Card -->
+    <div class="card card-custom border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-custom table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;" class="text-center">ID</th>
+                        <th style="width: 100px;" class="text-center">Hình Ảnh</th>
+                        <th>Tên Sản Phẩm</th>
+                        <th>Danh Mục</th>
+                        <th>Giá Bán</th>
+                        <th>Mô Tả</th>
+                        <th style="width: 160px;" class="text-center">Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(products)}">
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                            Chưa có sản phẩm nào. Hãy bấm "Thêm Sản Phẩm Mới" để bắt đầu!
+                        </td>
+                    </tr>
+                    <tr th:each="product : ${products}">
+                        <td class="text-center fw-medium text-secondary" th:text="${product.id}">1</td>
+                        <td class="text-center">
+                            <div th:if="${product.image != null and !product.image.isEmpty()}">
+                                <img th:src="${product.image}"
+                                     alt="Ảnh sản phẩm"
+                                     class="rounded-3 border shadow-sm"
+                                     style="width: 60px; height: 60px; object-fit: cover;" />
+                            </div>
+                            <div th:if="${product.image == null or product.image.isEmpty()}"
+                                 class="rounded-3 border bg-light d-inline-flex align-items-center justify-content-center text-muted"
+                                 style="width: 60px; height: 60px;">
+                                <i class="bi bi-image text-secondary fs-4"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-dark" th:text="${product.name}">Tên sản phẩm</div>
+                        </td>
+                        <td>
+                            <span th:if="${product.category != null}"
+                                  class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1"
+                                  th:text="${product.category.name}">Danh mục</span>
+                            <span th:if="${product.category == null}"
+                                  class="badge bg-secondary-subtle text-secondary px-2 py-1">Chưa phân loại</span>
+                        </td>
+                        <td>
+                            <span class="fw-bold text-danger"
+                                  th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">20,000,000 VNĐ</span>
+                        </td>
+                        <td>
+                            <div class="text-secondary small text-truncate" style="max-width: 250px;" th:text="${product.description}">Mô tả ngắn</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <a th:href="@{/products/edit/{id}(id=${product.id})}"
+                                   class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1"
+                                   title="Chỉnh sửa sản phẩm">
+                                    <i class="bi bi-pencil-square"></i> Sửa
+                                </a>
+                                <a th:href="@{/products/delete/{id}(id=${product.id})}"
+                                   class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1"
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')"
+                                   title="Xóa sản phẩm">
+                                    <i class="bi bi-trash3"></i> Xóa
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </section>
 </body>
 </html>
