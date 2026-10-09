@@ -1,5 +1,10 @@
 package com.example.saleappv1.config;
 
+import com.example.saleappv1.model.Category;
+import com.example.saleappv1.model.Product;
+import com.example.saleappv1.repository.CategoryRepository;
+import com.example.saleappv1.repository.ProductRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,5 +42,44 @@ public class DatabaseConfig {
                     .password("")
                     .build();
         }
+    }
+
+    @Bean
+    public CommandLineRunner initData(CategoryRepository categoryRepository, ProductRepository productRepository) {
+        return args -> {
+            if (categoryRepository.count() == 0) {
+                Category cat1 = new Category();
+                cat1.setName("Điện Thoại");
+                categoryRepository.save(cat1);
+
+                Category cat2 = new Category();
+                cat2.setName("Máy Tính Bảng");
+                categoryRepository.save(cat2);
+
+                Product p1 = new Product();
+                p1.setName("iPhone 14");
+                p1.setPrice(20000000.0);
+                p1.setDescription("Điện thoại Apple iPhone 14 chính hãng");
+                p1.setImage("/images/iphone-14.jpg");
+                p1.setCategory(cat1);
+                productRepository.save(p1);
+
+                Product p2 = new Product();
+                p2.setName("Samsung Galaxy S24 Ultra");
+                p2.setPrice(28000000.0);
+                p2.setDescription("Điện thoại Samsung cao cấp với bút S-Pen");
+                p2.setImage("/images/samsung-s24-ultra.jpg");
+                p2.setCategory(cat1);
+                productRepository.save(p2);
+
+                Product p3 = new Product();
+                p3.setName("iPad Pro M4");
+                p3.setPrice(26000000.0);
+                p3.setDescription("Máy tính bảng Apple iPad Pro chip M4 siêu mạnh");
+                p3.setImage("/images/ipad-pro-m4.jpg");
+                p3.setCategory(cat2);
+                productRepository.save(p3);
+            }
+        };
     }
 }
