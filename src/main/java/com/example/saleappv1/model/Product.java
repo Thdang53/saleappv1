@@ -2,6 +2,8 @@ package com.example.saleappv1.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -19,12 +21,14 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Tên là bắt buộc")
     @Column(nullable = false, length = 255)
     private String name;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @NotNull(message = "Giá là bắt buộc")
     @Column(nullable = false)
     private Double price;
 

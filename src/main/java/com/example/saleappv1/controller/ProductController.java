@@ -2,71 +2,71 @@ package com.example.saleappv1.controller;
 
 import com.example.saleappv1.model.Category;
 import com.example.saleappv1.model.Product;
+import com.example.saleappv1.service.CategoryService;
 import com.example.saleappv1.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
 @Controller
+@RequestMapping("/products")
 public class ProductController {
-
-    private final ProductService productService;
-
     @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
+    private ProductService productService;
+    @Autowired
+    private CategoryService categoryService; // Dùng để nạp danh sách danh mục khi thêm/sửa sản phẩm
+
+    @GetMapping
+    public String showProductList(Model model) {
+        model.addAttribute("products", productService.getAllProducts());
+        return "/products/products-list";
     }
 
-    /**
-     * Yêu cầu 3 & Yêu cầu 5: Hiển thị danh sách sản phẩm, hỗ trợ lọc và tìm kiếm
-     */
-    @GetMapping("/products")
-    public String products(
-            @RequestParam(required = false) Integer categoryId,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Double fromPrice,
-            @RequestParam(required = false) Double toPrice,
-            Model model) {
-
-        List<Product> productList = productService.getProducts(categoryId, keyword, fromPrice, toPrice);
-        List<Category> categoryList = productService.getAllCategories();
-
-        model.addAttribute("products", productList);
-        model.addAttribute("categories", categoryList);
-        model.addAttribute("selectedCategoryId", categoryId);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("fromPrice", fromPrice);
-        model.addAttribute("toPrice", toPrice);
-
-        // Tìm tên danh mục đang chọn (nếu có)
-        if (categoryId != null) {
-            Category selectedCategory = productService.getCategoryById(categoryId);
-            model.addAttribute("selectedCategoryName", selectedCategory != null ? selectedCategory.getName() : null);
-        }
-
-        return "products";
+    @GetMapping("/add")
+    public String showAddForm(Model model) {
+        model.addAttribute("product", new Product());
+        model.addAttribute("categories", categoryService.getAllCategories()); // Đổ dữ liệu danh mục ra dropdown select
+        return "/products/add-product";
     }
 
-    /**
-     * Yêu cầu 4: Xem chi tiết sản phẩm theo id
-     */
-    @GetMapping("/products/{productId}")
-    public String productDetail(@PathVariable Integer productId, Model model) {
-        Product product = productService.getProductById(productId);
-        if (product == null) {
-            return "redirect:/products";
+    @PostMapping("/add")
+    public String addProduct(@Valid Product product, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("categories", categoryService.getAllCategories()); // Nạp lại danh mục nếu form lỗi
+            return "/products/add-product";
         }
+        productService.addProduct(product);
+        return "redirect:/products";
+    }
 
-        Category category = productService.getCategoryById(product.getCategoryId());
-
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Long id, Model model) {
+        Product product = productService.getProductById(id)
+                .orElseThrow(() -> new IllegalArgumentException("ID sản phẩm không hợp lệ: " + id));
         model.addAttribute("product", product);
-        model.addAttribute("category", category);
+        model.addAttribute("categories", categoryService.getAllCategories()); // Nạp danh mục để người dùng thay đổi
+        return "/products/update-product";
+    }
 
-        return "product-detail";
+    @PostMapping("/update/{id}")
+    public String updateProduct(@PathVariable Long id, @Valid Product product, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            product.setId(id);
+            model.addAttribute("categories", categoryService.getAllCategories());
+            return "/products/update-product";
+        }
+        productService.updateProduct(product);
+        return "redirect:/products";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteProduct(@PathVariable Long id) {
+        productService.deleteProductById(id);
+        return "redirect:/products";
     }
 }

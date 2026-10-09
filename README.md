@@ -123,3 +123,49 @@ mvn spring-boot:run
    git branch -M main
    git push -u origin main
    ```
+
+---
+
+## 6. BÀI THỰC HÀNH 4: XÂY DỰNG CHỨC NĂNG HIỂN THỊ / THÊM / XÓA / SỬA (CRUD)
+
+### Giai đoạn 1: Quản lý Danh mục (Category)
+- **Lớp nghiệp vụ Service**: `CategoryService.java`
+  - Thực hiện các thao tác CRUD với `CategoryRepository`:
+    - `getAllCategories()`: Lấy toàn bộ danh mục.
+    - `getCategoryById(id)`: Tìm danh mục theo ID.
+    - `addCategory(category)`: Thêm mới danh mục vào Database.
+    - `updateCategory(category)`: Cập nhật tên danh mục.
+    - `deleteCategoryById(id)`: Xóa danh mục theo ID.
+- **Lớp điều khiển Controller**: `CategoryController.java` (`@RequestMapping("/categories")`)
+  - `@GetMapping`: Hiển thị danh sách danh mục (`/categories/categories-list`).
+  - `@GetMapping("/add")` & `@PostMapping("/add")`: Hiển thị form và lưu thêm mới danh mục với kiểm tra hợp lệ (`@Valid`, `BindingResult`).
+  - `@GetMapping("/edit/{id}")` & `@PostMapping("/update/{id}")`: Hiển thị form cập nhật và lưu thay đổi danh mục.
+  - `@GetMapping("/delete/{id}")`: Xóa danh mục và chuyển hướng về danh sách.
+- **Giao diện Thymeleaf Templates**:
+  - `templates/categories/categories-list.html`: Danh sách danh mục dạng bảng kèm nút Thêm mới, Sửa, Xóa.
+  - `templates/categories/add-category.html`: Form nhập tên danh mục mới.
+  - `templates/categories/update-category.html`: Form cập nhật thông tin danh mục.
+
+### Giai đoạn 2: Quản lý Sản phẩm (Product)
+- **Lớp nghiệp vụ Service**: `ProductService.java`
+  - Thực hiện các thao tác CRUD với `ProductRepository`:
+    - `getAllProducts()`: Lấy danh sách sản phẩm.
+    - `getProductById(id)`: Lấy chi tiết sản phẩm.
+    - `addProduct(product)`: Lưu sản phẩm mới vào Database.
+    - `updateProduct(product)`: Cập nhật thông tin sản phẩm (tên, giá, mô tả, danh mục).
+    - `deleteProductById(id)`: Xóa sản phẩm theo ID.
+- **Lớp điều khiển Controller**: `ProductController.java` (`@RequestMapping("/products")`)
+  - `@GetMapping`: Hiển thị danh sách sản phẩm (`/products/products-list`).
+  - `@GetMapping("/add")` & `@PostMapping("/add")`: Nạp danh sách danh mục từ `CategoryService` vào dropdown `<select>` để chọn khi thêm mới sản phẩm.
+  - `@GetMapping("/edit/{id}")` & `@PostMapping("/update/{id}")`: Nạp dữ liệu cũ và danh sách danh mục để cập nhật sản phẩm.
+  - `@GetMapping("/delete/{id}")`: Xóa sản phẩm theo ID.
+- **Giao diện Thymeleaf Templates**:
+  - `templates/products/products-list.html`: Danh sách sản phẩm dạng bảng (ID, Tên, Giá, Mô tả, Danh mục, Hành động).
+  - `templates/products/add-product.html`: Form thêm mới sản phẩm với dropdown chọn danh mục.
+  - `templates/products/update-product.html`: Form cập nhật sản phẩm.
+
+### Khung giao diện dùng chung (Decorator Layout)
+- `templates/layout.html`: Tích hợp Thymeleaf Layout Dialect (`layout:decorate="~{layout}"`) và Bootstrap 5.3, thanh điều hướng chuẩn theo bài học.
+- **Cổng dịch vụ**: `http://localhost:9999`
+  - Quản lý Danh mục: `http://localhost:9999/categories`
+  - Quản lý Sản phẩm: `http://localhost:9999/products`
